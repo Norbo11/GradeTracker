@@ -1,0 +1,28 @@
+{% extends "grades/base.html" %}
+{% block content %}
+
+<div class="content">
+    {% for unit in units %}
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">Unit: {{ unit.name }}</h3>
+        </div>
+        <div class="panel-body">
+          <table class="table table-hover">
+            <thead>
+              <tr><th>Chapters</th></tr>
+            </thead>
+            <tbody>
+              {% for chapter in unit.chapter_set.all %}
+                <tr>
+                  <td>{{ chapter.name }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "grades/base.html" %}
+{% block content %}
+
+<div id="home-page" class="content">
+    <form role="form" method="post" action=".">
+    {% csrf_token %}
+    {% for studied_subject in studied_subjects %}
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">Subject: {{ studied_subject.subject.name }}</h3>
+        </div>
+        <div class="panel-body">
+          {% for unit in studied_subject.subject.unit_set.all %}
+            <div class="panel panel-success">
+              <div class="panel-heading">
+                <h3 class="panel-title">Unit: {{ unit.name }}</h3>
+              </div>
+              <div class="panel-body">
+                <table id="grades-table" class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Chapter</th>
+                      <th>Self-Prediction</th>
+                      <th>Test Grade</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% load grades_extras %}
+                    {% for chapter in unit.chapter_set.all %}
+                      <tr>
+                        <td>{{ chapter.name }}</td>
+                        <td width="15%"
+                          {% if predicted_grades|keyvalue:chapter.id == 7 %} class="has-success"
+                          {% elif predicted_grades|keyvalue:chapter.id == 6 %} class="has-warning"
+                          {% else %} class="has-error"
+                          {% endif %}
+                          >
+                          <select name="predicted-grade-{{ studied_subject.id }}-{{ unit.id }}-{{ chapter.id }}" type="text" class="form-control">
+                            {% for gradekey, gradevalue in grades %}
+                              <option value="{{ gradekey }}" {% if gradekey == predicted_grades|keyvalue:chapter.id %} selected="selected" {% endif %}>{{ gradevalue }}</option>
+                            {% endfor %}
+                          </select>
+                        </td>
+                        <td width="15%"
+                          {% if test_grades|keyvalue:chapter.id == 7 %} class="has-success"
+                          {% elif test_grades|keyvalue:chapter.id == 6 %} class="has-warning"
+                          {% else %} class="has-error"
+                          {% endif %}
+                          >
+                          <select name="test-grade-{{ studied_subject.id }}-{{ unit.id }}-{{ chapter.id }}" type="text" class="form-control">
+                            {% for gradekey, gradevalue in grades %}
+                              <option value="{{ gradekey }}" {% if gradekey == test_grades|keyvalue:chapter.id %} selected="selected" {% endif %}>{{ gradevalue }}</option>
+                            {% endfor %}
+                          </select>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div> <!-- Unit Body -->
+            </div> <!-- Unit Panel -->
+          {% endfor %} <!-- Unit Loop -->
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Update all grades</button>
+    {% endfor %} <!-- Subject Loop -->
+    </form>
+</div>
+
+{% endblock %}
